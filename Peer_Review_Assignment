@@ -394,7 +394,9 @@ i. Indicate the type of analysis you chose to do:
 I am going to investigate whether specific type of food is more popular among the residents of the cities in the dataset.
 
 ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
-                           
+First, given different types of foods (dishes) must be selected, the average rating (stars) and the average number of comments given to each type of food must be studied based on the city that they are selected.
+From the created table, it can be seen that the Korean and Japanese foods are more popular in Toronto while in Las Vegas French and Chinese dishes are having a high rating and number of reviews.
+
                   
 iii. Output of your finished dataset:
 
