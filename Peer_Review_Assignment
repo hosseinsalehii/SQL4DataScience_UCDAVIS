@@ -59,7 +59,7 @@ SELECT COUNT(*)
 FROM user
 WHERE column_name IS NULL
 
-//**SAMPLE RESULT**//
+//**SAMPLE Output**//
 +----------+
 | COUNT(*) |
 +----------+
@@ -99,7 +99,7 @@ v. Table: User, Column: Review_count
 SELECT MIN(Stars),MAX(Stars),AVG(Stars)
 FROM Review
 
-//**SAMPLE RESULT**//
+//**SAMPLE Output**//
 +------------+------------+------------+
 | MIN(Stars) | MAX(Stars) | AVG(Stars) |
 +------------+------------+------------+
@@ -229,7 +229,7 @@ SELECT name, review_count, fans
 FROM user
 ORDER BY fans DESC, review_count DESC;
 
-//**SAMPLE RESULT**//
+//**SAMPLE Output**//
 
 +-----------+--------------+------+
 | name      | review_count | fans |
@@ -262,67 +262,161 @@ ORDER BY fans DESC, review_count DESC;
 +-----------+--------------+------+
 (Output limit exceeded, 25 of 10000 total rows shown)
 
+Based the on the results above, there is no clear relationship between the number of reviews and number of fans. For instance, Amy and Yuri with the most and least fans
+(respectively) are having the least and most number of reviews on the list. This shows that there might be some other explanatory factors that needs to be investigated.
 
 	
 9. Are there more reviews with the word "love" or with the word "hate" in them?
 
-	Answer:
-
+Answer:
+Yes, according to the results, there are 1780 reviews with the word "love" and only 232 reviews with the word "hate".
 	
+Love Counts
++----------+
+| COUNT(*) |
++----------+
+|     1780 |
++----------+
+
+Hate Counts
++----------+
+| COUNT(*) |
++----------+
+|      232 |
++----------+
+
 	SQL code used to arrive at answer:
 
-	
+SELECT COUNT(*)
+FROM review
+WHERE text LIKE "%love%" 
+
+SELECT COUNT(*)
+FROM review
+WHERE text LIKE "%hate%" 
 	
 10. Find the top 10 users with the most fans:
 
-	SQL code used to arrive at answer:
-	
-	
-	Copy and Paste the Result Below:
+SQL code used to arrive at answer:
 
+SELECT name,fans
+FROM user
+ORDER BY fans DESC
+LIMIT 10	
+	
+Copy and Paste the Result Below:
+
++-----------+------+
+| name      | fans |
++-----------+------+
+| Amy       |  503 |
+| Mimi      |  497 |
+| Harald    |  311 |
+| Gerald    |  253 |
+| Christine |  173 |
+| Lisa      |  159 |
+| Cat       |  133 |
+| William   |  126 |
+| Fran      |  124 |
+| Lissa     |  120 |
++-----------+------+
 	
 		
 
 Part 2: Inferences and Analysis
 
 1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
-	
+(The city of Las Vegas and the food industry are selected)
 i. Do the two groups you chose to analyze have a different distribution of hours?
-
+Yes, the group with a higher star rating opens late and closes early on Saturdays.
 
 ii. Do the two groups you chose to analyze have a different number of reviews?
-         
+Yes, the group with a lower rating stars has also less review counts (a total of 6 reviews).
          
 iii. Are you able to infer anything from the location data provided between these two groups? Explain.
+No, there is no clear relationship between the location of the groups and their other data.
+
 
 SQL code used for analysis:
 
-		
+SELECT
+business.name, business.city, category.category, business.stars, hours.hours, business.review_count, business.address, business.postal_code
+FROM (business INNER JOIN category ON business.id =
+category.business_id) INNER JOIN hours ON hours.business_id =
+business.id
+WHERE business.city = 'Las Vegas' AND category.category = "Food"
+GROUP BY business.stars;
+
+Output:
+
++-----------------------------+-----------+----------+-------+----------------------+--------------+-----------------------------+-------------+
+| name                        | city      | category | stars | hours                | review_count | address                     | postal_code |
++-----------------------------+-----------+----------+-------+----------------------+--------------+-----------------------------+-------------+
+| Walgreens                   | Las Vegas | Food     |   2.5 | Saturday|8:00-22:00  |            6 | 3808 E Tropicana Ave        | 89121       |
+| Sweet Ruby Jane Confections | Las Vegas | Food     |   4.0 | Saturday|10:00-19:00 |           30 | 8975 S Eastern Ave, Ste 3-B | 89123       |
++-----------------------------+-----------+----------+-------+----------------------+--------------+-----------------------------+-------------+
+
 		
 2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and the SQL code you used to arrive at your answer.
 		
 i. Difference 1:
-         
-         
+On average, the group that is still open has a higher rating stars compared to the group that is not open.
+
 ii. Difference 2:
-         
+On average, the group that is still open has a fewer number of reviews compared to the group that is not open
          
          
 SQL code used for analysis:
 
-	
+SELECT business.name, business.is_open, category.category, business.stars, hours.hours, business.review_count, business.postal_code
+FROM (business inner join category on business.id = category.business_id) inner join hours on hours.business_id = category.business_id
+WHERE business.city = 'Las Vegas' 
+GROUP BY business.is_open;
+
+
+Output:
+
++--------------------------+---------+-------------+-------+----------------------+--------------+-------------+
+| name                     | is_open | category    | stars | hours                | review_count | postal_code |
++--------------------------+---------+-------------+-------+----------------------+--------------+-------------+
+| Jacques Cafe             |       0 | Gluten-Free |   4.0 | Saturday|11:00-20:00 |          168 | 89134       |
+| Desert Medical Equipment |       1 | Shopping    |   5.0 | Monday|8:00-17:00    |            4 | 89118       |
++--------------------------+---------+-------------+-------+----------------------+--------------+-------------+
+
+
+
 	
 3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and are going to prepare the data for analysis.
 
 Ideas for analysis include: Parsing out keywords and business attributes for sentiment analysis, clustering businesses to find commonalities or anomalies between them, predicting the overall star rating for a business, predicting the number of fans a user will have, and so on. These are just a few examples to get you started, so feel free to be creative and come up with your own problem you want to solve. Provide answers, in-line, to all of the following:
 	
 i. Indicate the type of analysis you chose to do:
-         
-         
+I am going to investigate whether specific type of food is more popular among the residents of the cities in the dataset.
+
 ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
                            
                   
 iii. Output of your finished dataset:
-         
+
++----------+----------------------+---------------+-------------------+-----------+
+| category | Number_Of_Resturants |    AVG(stars) | AVG(review_count) | city      |
++----------+----------------------+---------------+-------------------+-----------+
+| Korean   |                    7 |           4.5 |               8.0 | Toronto   |
+| French   |                   12 |           4.0 |     135.083333333 | Las Vegas |
+| Chinese  |                   13 | 3.76923076923 |     423.230769231 | Las Vegas |
+| Mexican  |                   28 |         3.625 |              73.0 | Edinburgh |
+| Italian  |                   13 | 3.53846153846 |     78.2307692308 | Montréal  |
+| Japanese |                   20 |         3.475 |             22.85 | Toronto   |
++----------+----------------------+---------------+-------------------+-----------+
          
 iv. Provide the SQL code you used to create your final dataset:
+
+SELECT c.category,COUNT(b.name) AS
+Number_Of_Resturants,AVG(stars),AVG(review_count),b.city
+FROM (business b INNER JOIN hours h ON b.id = h.business_id)
+INNER JOIN category c ON c.business_id = b.id
+WHERE c.category IN
+("Chinese","Mexican","French","Italian","Korean","Japanese","Ind
+ian")
+GROUP BY c.category
+ORDER BY AVG(stars) DESC
